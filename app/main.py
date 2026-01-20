@@ -11,6 +11,9 @@ def read_root():
         "cloud": "Azure",
         "deployed_via": "GitHub Actions + Terraform"
     }
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     import uvicorn

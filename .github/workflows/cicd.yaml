@@ -1,0 +1,46 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Pozwala uruchomić pipeline ręcznie przyciskiem
+
+env:
+  # ZMIEŃ TO na nazwę swojej aplikacji w Azure (tę z Terraform/Portalu)
+  AZURE_WEBAPP_NAME: "AplikAcjadoMojegoCv" 
+  
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Wymagane, żeby wysłać obraz do GHCR
+
+    steps:
+      # 1. Pobranie kodu
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Logowanie do rejestru GitHub (GHCR)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Konwersja nazwy repozytorium na małe litery (Docker nie lubi dużych liter)
+      - name: Lowercase image name
+        run: |
+          echo "IMAGE_NAME=${IMAGE_NAME,,}" >>${GITHUB_ENV}
+
+      # 4. Budowa i wysyłka obrazu (Build & Push)
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
