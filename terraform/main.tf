@@ -19,7 +19,7 @@ resource "azurerm_linux_web_app" "app" {
 
   site_config {
     application_stack {
-      docker_image_name   = "ghcr.io/MaayoAko/my-devops-project:latest"
+      docker_image_name   = "ghcr.io/MaayoAko/projektownik:latest"
       docker_registry_url = "https://ghcr.io"
       # Jeśli repo jest prywatne, będziesz musiał dodać credentials
     }
